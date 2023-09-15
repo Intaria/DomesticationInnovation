@@ -235,18 +235,6 @@ public class CommonProxy {
     }
 
     @SubscribeEvent
-    public void onItemDespawnEvent(ItemExpireEvent event) {
-        if (event.getEntity().getItem().getItem() == Items.APPLE && DomesticationMod.CONFIG.rottenApple.get()) {
-            if (new Random().nextFloat() < 0.1F * event.getEntity().getItem().getCount()) {
-                event.getEntity().getItem().shrink(1);
-                event.setExtraLife(10);
-                ItemEntity rotten = new ItemEntity(event.getEntity().level, event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ(), new ItemStack(DIItemRegistry.ROTTEN_APPLE.get()));
-                event.getEntity().getLevel().addFreshEntity(rotten);
-            }
-        }
-    }
-
-    @SubscribeEvent
     public void onLivingUpdate(LivingEvent.LivingTickEvent event) {
         int frozenTime = TameableUtils.getFrozenTime(event.getEntity());
         if (TameableUtils.couldBeTamed(event.getEntity()) && canTickCollar(event.getEntity())) {

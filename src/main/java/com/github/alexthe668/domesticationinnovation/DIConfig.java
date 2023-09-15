@@ -19,14 +19,12 @@ public class DIConfig {
     public final ForgeConfigSpec.BooleanValue tameableRabbit;
     public final ForgeConfigSpec.BooleanValue tameableFrog;
     public final ForgeConfigSpec.BooleanValue swingThroughPets;
-    public final ForgeConfigSpec.BooleanValue rottenApple;
     public final ForgeConfigSpec.BooleanValue petBedRespawns;
     public final ForgeConfigSpec.BooleanValue collarTag;
     public final ForgeConfigSpec.BooleanValue rabbitsScareRavagers;
     public final ForgeConfigSpec.BooleanValue animalTamerVillager;
 
     public final ForgeConfigSpec.BooleanValue petCurseEnchantmentsLootOnly;
-    public final ForgeConfigSpec.DoubleValue sinisterCarrotLootChance;
     public final ForgeConfigSpec.DoubleValue vampirismLootChance;
     public final ForgeConfigSpec.DoubleValue oreScentingLootChance;
     public final ForgeConfigSpec.DoubleValue muffledLootChance;
@@ -43,7 +41,6 @@ public class DIConfig {
         tameableRabbit = builder.comment("true if rabbits are fully tameable (rabbit must be tamed with carrots)").translation("tameable_rabbit").define("tameable_rabbit", true);
         tameableFrog = builder.comment("true if frogs are fully tameable (rabbit must be tamed with spider eyes)").translation("tameable_rabbit").define("tameable_frog", true);
         swingThroughPets = builder.comment("true if attacks do not register on pets from their owners and go through them to attack a mob behind them").translation("swing_through_pets").define("swing_through_pets", true);
-        rottenApple = builder.comment("true if apples can turn into rotten apples if they despawn").translation("rotten_apple").define("rotten_apple", true);
         petBedRespawns = builder.comment("true if mobs can respawn in pet beds the next morning after they die").translation("pet_bed_respawns").define("pet_bed_respawns", true);
         collarTag = builder.comment("true if collar tag functionality are enabled. If this is disabled, there is no way to enchant mobs!").translation("collar_tags").define("collar_tags", true);
         rabbitsScareRavagers = builder.comment("true if rabbits scare ravagers like they used to do").translation("rabbits_scare_ravagers").define("rabbits_scare_ravagers", true);
@@ -51,7 +48,6 @@ public class DIConfig {
         builder.pop();
         builder.push("loot");
         petCurseEnchantmentsLootOnly = builder.comment("true if pet curse enchantments should only appear in loot, and not the enchanting table.").translation("pet_curse_enchantments_loot_only").define("pet_curse_enchantments_loot_only", true);
-        sinisterCarrotLootChance = builder.comment("percent chance of woodland mansion loot table containing sinister carrot:").translation("sinister_carrot_loot_chance").defineInRange("sinister_carrot_loot_chance", 0.3D, 0.0, 1.0D);
         vampirismLootChance = builder.comment("percent chance of woodland mansion loot table containing Vampire book:").translation("vampirism_loot_chance").defineInRange("vampirism_loot_chance", 0.22D, 0.0, 1.0D);
         oreScentingLootChance = builder.comment("percent chance of mineshaft loot table containing Ore Scenting book:").translation("ore_scenting_loot_chance").defineInRange("ore_scenting_loot_chance", 0.15D, 0.0, 1.0D);
         muffledLootChance = builder.comment("percent chance of ancient city loot table containing Muffled book:").translation("muffled_loot_chance").defineInRange("muffled_loot_chance", 0.19D, 0.0, 1.0D);
