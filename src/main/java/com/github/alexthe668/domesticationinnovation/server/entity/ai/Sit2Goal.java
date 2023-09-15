@@ -24,7 +24,7 @@ public class Sit2Goal extends Goal {
             return false;
         } else if (this.mob.isInWaterOrBubble()) {
             return false;
-        } else if (!this.mob.onGround()) {
+        } else if (!this.mob.isOnGround()) {
             return false;
         } else {
             return ((ModifedToBeTameable)this.mob).isStayingStill();
