@@ -16,7 +16,6 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.item.trading.MerchantOffer;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 import java.util.Random;
@@ -100,7 +99,7 @@ public class EnchantItemTrade implements VillagerTrades.ItemListing {
         Item item = stack.getItem();
         boolean flag = stack.is(Items.BOOK);
 
-        for(Enchantment enchantment : ForgeRegistries.ENCHANTMENTS) {
+        for(Enchantment enchantment : Registry.ENCHANTMENT) {
             if (enchantment.isTradeable() && enchantment.isDiscoverable() && (enchantment.canApplyAtEnchantingTable(stack) || (flag && enchantment.isAllowedOnBooks()))) {
                 for(int i = enchantment.getMaxLevel(); i > enchantment.getMinLevel() - 1; --i) {
                     if (levels >= enchantment.getMinCost(i) && levels <= enchantment.getMaxCost(i)) {
