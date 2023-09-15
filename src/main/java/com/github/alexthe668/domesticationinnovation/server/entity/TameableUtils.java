@@ -46,16 +46,9 @@ public class TameableUtils {
 
     private static final String ENCHANTMENT_TAG = "StoredPetEnchantments";
     private static final String COLLAR_TAG = "HasPetCollar";
-    private static final String IMMUNITY_TIME_TAG = "PetImmunityTimer";
     private static final String FROZEN_TIME_TAG = "PetFrozenTime";
     private static final String ATTACK_TARGET_ENTITY = "PetAttackTarget";
-    private static final String SHADOW_PUNCH_TIMES = "PetShadowPunchTimes";
-    private static final String SHADOW_PUNCH_COOLDOWN = "PetShadowPunchCooldown";
-    private static final String PSYCHIC_WALL_COOLDOWN = "PetPsychicWallCooldown";
     private static final String INTIMIDATION_COOLDOWN = "PetIntimidationCooldown";
-    private static final String SHADOW_PUNCH_STRIKING = "PetShadowPunchStriking";
-    private static final String JUKEBOX_FOLLOWER_UUID = "PetJukeboxFollowerUUID";
-    private static final String JUKEBOX_FOLLOWER_DISC = "PetJukeboxFollowerDisc";
     private static final String BLAZING_PROTECTION_BARS = "PetBlazingProtectionBars";
     private static final String BLAZING_PROTECTION_COOLDOWN = "PetBlazingProtectionCooldown";
     private static final String HEALING_AURA_TIME = "PetHealingAuraTime";
@@ -355,22 +348,6 @@ public class TameableUtils {
         return tag.contains(COLLAR_TAG) && tag.getBoolean(COLLAR_TAG);
     }
 
-    public static int getImmuneTime(LivingEntity enchanted) {
-        if (hasEnchant(enchanted, DIEnchantmentRegistry.IMMUNITY_FRAME)) {
-            CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
-            return tag.getInt(IMMUNITY_TIME_TAG);
-        }
-        return 0;
-    }
-
-    public static void setImmuneTime(LivingEntity enchanted, int time) {
-        if (hasEnchant(enchanted, DIEnchantmentRegistry.IMMUNITY_FRAME)) {
-            CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
-            tag.putInt(IMMUNITY_TIME_TAG, time);
-            sync(enchanted, tag);
-        }
-    }
-
     public static int getFrozenTime(LivingEntity enchanted) {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
         return tag.getInt(FROZEN_TIME_TAG);
@@ -396,72 +373,6 @@ public class TameableUtils {
     public static void setPetAttackTarget(LivingEntity enchanted, int id) {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
         tag.putInt(ATTACK_TARGET_ENTITY, id);
-        sync(enchanted, tag);
-    }
-
-    public static int getShadowPunchCooldown(LivingEntity enchanted) {
-        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
-        return tag.getInt(SHADOW_PUNCH_COOLDOWN);
-    }
-
-    public static void setShadowPunchCooldown(LivingEntity enchanted, int time) {
-        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
-        tag.putInt(SHADOW_PUNCH_COOLDOWN, time);
-        sync(enchanted, tag);
-    }
-
-    public static int[] getShadowPunchTimes(LivingEntity enchanted) {
-        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
-        return tag.getIntArray(SHADOW_PUNCH_TIMES);
-    }
-
-    public static void setShadowPunchTimes(LivingEntity enchanted, int[] times) {
-        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
-        tag.putIntArray(SHADOW_PUNCH_TIMES, times);
-        sync(enchanted, tag);
-    }
-
-    public static void setShadowPunchStriking(LivingEntity enchanted, int[] times) {
-        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
-        tag.putIntArray(SHADOW_PUNCH_STRIKING, times);
-        sync(enchanted, tag);
-    }
-
-    public static int[] getShadowPunchStriking(LivingEntity enchanted) {
-        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
-        return tag.getIntArray(SHADOW_PUNCH_STRIKING);
-    }
-
-    public static void setPetJukeboxUUID(LivingEntity enchanted, UUID id) {
-        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
-        tag.putUUID(JUKEBOX_FOLLOWER_UUID, id);
-        sync(enchanted, tag);
-    }
-
-    public static UUID getPetJukeboxUUID(LivingEntity enchanted) {
-        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
-        return tag.contains(JUKEBOX_FOLLOWER_UUID) ? tag.getUUID(JUKEBOX_FOLLOWER_UUID) : null;
-    }
-
-    public static void setPetJukeboxDisc(LivingEntity enchanted, ItemStack stack) {
-        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
-        tag.put(JUKEBOX_FOLLOWER_DISC, stack.save(new CompoundTag()));
-        sync(enchanted, tag);
-    }
-
-    public static ItemStack getPetJukeboxDisc(LivingEntity enchanted) {
-        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
-        return tag.contains(JUKEBOX_FOLLOWER_DISC) ? ItemStack.of(tag.getCompound(JUKEBOX_FOLLOWER_DISC)) : ItemStack.EMPTY;
-    }
-
-    public static int getPsychicWallCooldown(LivingEntity enchanted) {
-        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
-        return tag.getInt(PSYCHIC_WALL_COOLDOWN);
-    }
-
-    public static void setPsychicWallCooldown(LivingEntity enchanted, int time) {
-        CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(enchanted);
-        tag.putInt(PSYCHIC_WALL_COOLDOWN, time);
         sync(enchanted, tag);
     }
 
@@ -675,45 +586,6 @@ public class TameableUtils {
         }
     }
 
-    public static void destroyRandomPlants(LivingEntity living) {
-        if ((living.tickCount + living.getId()) % 200 == 0) {
-            int range = 2;
-            List<BlockPos> plants = new ArrayList<>();
-            List<BlockPos> grasses = new ArrayList<>();
-            BlockPos blockpos = living.blockPosition();
-            int half = range / 2;
-            RandomSource r = living.getRandom();
-            int maxPlants = 2 + r.nextInt(2);
-            for (int i = 0; i <= half && i >= -half; i = (i <= 0 ? 1 : 0) - i) {
-                for (int j = 0; j <= range && j >= -range; j = (j <= 0 ? 1 : 0) - j) {
-                    for (int k = 0; k <= range && k >= -range; k = (k <= 0 ? 1 : 0) - k) {
-                        BlockPos offset = blockpos.offset(j, i, k);
-                        BlockState state = living.getLevel().getBlockState(offset);
-                        if (!state.isAir() && r.nextInt(4) == 0) {
-                            if (state.is(BlockTags.FLOWERS) || state.is(BlockTags.REPLACEABLE_PLANTS) || state.is(BlockTags.CROPS)) {
-                                plants.add(offset);
-                            } else if (state.is(BlockTags.DIRT) && !state.is(Blocks.DIRT) && !state.is(Blocks.COARSE_DIRT) || state.is(Blocks.FARMLAND)) {
-                                grasses.add(offset);
-                            }
-                        }
-                    }
-                }
-            }
-            for (BlockPos plant : plants) {
-                living.getLevel().setBlockAndUpdate(plant, Blocks.AIR.defaultBlockState());
-                for (int i = 0; i < 1 + r.nextInt(2); i++) {
-                    living.getLevel().addParticle(DIParticleRegistry.BLIGHT.get(), plant.getX() + r.nextFloat(), plant.getY() + r.nextFloat(), plant.getZ() + r.nextFloat(), 0, 0.08F, 0);
-                }
-            }
-            for (BlockPos dirt : grasses) {
-                living.getLevel().setBlockAndUpdate(dirt, r.nextBoolean() ? Blocks.COARSE_DIRT.defaultBlockState() : Blocks.DIRT.defaultBlockState());
-                for (int i = 0; i < 1 + r.nextInt(2); i++) {
-                    living.getLevel().addParticle(DIParticleRegistry.BLIGHT.get(), dirt.getX() + r.nextFloat(), dirt.getY() + 1, dirt.getZ() + r.nextFloat(), 0, 0.08F, 0);
-                }
-            }
-        }
-    }
-
     public static List<LivingEntity> getAuraHealables(LivingEntity pet) {
         Predicate<Entity> hurtAndOnTeam = (animal) -> hasSameOwnerAs((LivingEntity) animal, pet) && animal.distanceTo(pet) < 4 && ((LivingEntity) animal).getHealth() < ((LivingEntity) animal).getMaxHealth();
         return pet.level.getEntitiesOfClass(LivingEntity.class, pet.getBoundingBox().inflate(4, 4, 4), EntitySelector.NO_SPECTATORS.and(hurtAndOnTeam));
@@ -760,13 +632,6 @@ public class TameableUtils {
     }
 
     public static boolean isValidTeleporter(LivingEntity owner, Mob animal) {
-        if (hasEnchant(animal, DIEnchantmentRegistry.TETHERED_TELEPORT)) {
-            if (animal instanceof IComandableMob commandableMob) {
-                return commandableMob.getCommand() == 2;
-            } else if (animal instanceof TamableAnimal tame) {
-                return !tame.isOrderedToSit() && animal.distanceTo(owner) < 10;
-            }
-        }
         return false;
     }
 

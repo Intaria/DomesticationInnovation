@@ -39,11 +39,7 @@ public class DIBlockRegistry {
     public static final RegistryObject<Block> RED_PET_BED = registerBlockAndItem("pet_bed_red", () -> new PetBedBlock("red", DyeColor.RED));
     public static final RegistryObject<Block> BLACK_PET_BED = registerBlockAndItem("pet_bed_black", () -> new PetBedBlock("black", DyeColor.BLACK));
 
-    public static final RegistryObject<Block> DRUM = registerBlockAndItem("drum", () -> new DrumBlock());
-
-    public static final RegistryObject<Block> WAYWARD_LANTERN = registerBlockAndItem("wayward_lantern", () -> new WaywardLanternBlock());
-
-
+    
     public static RegistryObject<Block> registerBlockAndItem(String name, Supplier<Block> block){
         RegistryObject<Block> blockObj = DEF_REG.register(name, block);
         DIItemRegistry.DEF_REG.register(name, () -> new DIBlockItem(blockObj, new Item.Properties().tab(DICreativeModeTab.INSTANCE)));

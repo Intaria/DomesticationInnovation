@@ -5,7 +5,6 @@ import com.github.alexthe666.citadel.client.render.LightningRender;
 import com.github.alexthe668.domesticationinnovation.DomesticationMod;
 import com.github.alexthe668.domesticationinnovation.client.ClientProxy;
 import com.github.alexthe668.domesticationinnovation.client.model.BlazingBarModel;
-import com.github.alexthe668.domesticationinnovation.client.model.ShadowHandModel;
 import com.github.alexthe668.domesticationinnovation.server.enchantment.DIEnchantmentRegistry;
 import com.github.alexthe668.domesticationinnovation.server.entity.TameableUtils;
 import com.github.alexthe668.domesticationinnovation.server.item.DIItemRegistry;
@@ -42,11 +41,9 @@ import java.util.Random;
 
 public class LayerPetOverlays extends RenderLayer {
 
-    private static final ItemStack MAGNET = new ItemStack(DIItemRegistry.MAGNET.get());
     private static final int CLOUD_COUNT = 14;
     private static final Vec3[] CLOUD_OFFSETS = new Vec3[CLOUD_COUNT];
     private static final Vec3[] CLOUD_SCALES = new Vec3[CLOUD_COUNT];
-    private static final ShadowHandModel SHADOW_HAND_MODEL = new ShadowHandModel();
     private static final BlazingBarModel BLAZING_BAR_MODEL = new BlazingBarModel();
     private static final ResourceLocation BLAZE_TEXTURE = new ResourceLocation("textures/entity/blaze.png");
     private static final ResourceLocation AURA_TEXTURE = new ResourceLocation(DomesticationMod.MODID, "textures/healing_aura.png");
@@ -121,39 +118,6 @@ public class LayerPetOverlays extends RenderLayer {
             LivingEntity living = (LivingEntity) entity;
             float f = Mth.rotLerp(partialTicks, living.yBodyRotO, living.yBodyRot);
             float realAge = living.tickCount + partialTicks;
-            if (TameableUtils.hasEnchant(living, DIEnchantmentRegistry.IMMUNITY_FRAME) && TameableUtils.getImmuneTime((LivingEntity) entity) > 0) {
-                VertexConsumer ivertexbuilder = bufferIn.getBuffer(DIRenderTypes.IFRAME_GLINT);
-                float alpha = 0.5F;
-                matrixStackIn.pushPose();
-                this.getParentModel().renderToBuffer(matrixStackIn, ivertexbuilder, packedLightIn, LivingEntityRenderer.getOverlayCoords((LivingEntity) entity, 0), 1, 1, 1, alpha);
-                matrixStackIn.popPose();
-            }
-            if (TameableUtils.hasEnchant(living, DIEnchantmentRegistry.MAGNETIC)) {
-                Entity suck = TameableUtils.getPetAttackTarget(living);
-                if (suck != null) {
-                    double d0 = Mth.lerp(partialTicks, suck.xo, suck.getX()) - Mth.lerp(partialTicks, living.xo, living.getX());
-                    double d1 = Mth.lerp(partialTicks, suck.yo, suck.getY()) - Mth.lerp(partialTicks, living.yo, living.getY());
-                    double d2 = Mth.lerp(partialTicks, suck.zo, suck.getZ()) - Mth.lerp(partialTicks, living.zo, living.getZ());
-                    double d3 = d0 * d0 + d2 * d2 + d1 * d1;
-                    double d4 = Math.sqrt(d0 * d0 + d2 * d2);
-                    float f1 = (float) (Mth.atan2(d2, d0) * (double) (180F / (float) Math.PI)) - 90.0F;
-                    float f2 = (float) (-(Mth.atan2(d1, d4) * (double) (180F / (float) Math.PI)));
-                    matrixStackIn.pushPose();
-                    matrixStackIn.mulPose(Vector3f.YN.rotationDegrees(f));
-                    matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(f1));
-                    matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(f2));
-                    matrixStackIn.pushPose();
-                    float bob1 = (float) Math.sin(realAge * 0.5F) * 0.05F;
-                    float bob2 = (float) Math.sin(realAge * 0.3F) * 0.09F - 0.03F;
-                    float bob3 = (float) Math.cos(realAge * 0.1F) * 0.05F;
-                    matrixStackIn.translate(bob1, 1.25F - entity.getBbHeight() * 0.5F - bob2, -entity.getBbWidth() - 0.125F - bob3);
-                    matrixStackIn.mulPose(Vector3f.XN.rotationDegrees(90));
-                    matrixStackIn.scale(1.6F, 1.6F, 3F);
-                    Minecraft.getInstance().getItemRenderer().renderStatic(MAGNET, ItemTransforms.TransformType.GROUND, packedLightIn, OverlayTexture.NO_OVERLAY, matrixStackIn, bufferIn, entity.getId());
-                    matrixStackIn.popPose();
-                    matrixStackIn.popPose();
-                }
-            }
             if (TameableUtils.hasEnchant(living, DIEnchantmentRegistry.HEALTH_SIPHON)) {
                 Entity owner = TameableUtils.getOwnerOf(living);
                 if (owner != null && owner.isAlive() && owner.distanceTo(living) < 100) {
@@ -179,24 +143,6 @@ public class LayerPetOverlays extends RenderLayer {
                     matrixStackIn.popPose();
                 }
             }
-            if (TameableUtils.hasEnchant(living, DIEnchantmentRegistry.VOID_CLOUD) && !living.isInWaterOrBubble() && !living.isOnGround() && TameableUtils.getFallDistance(living) >= 3.0F) {
-                matrixStackIn.pushPose();
-                matrixStackIn.translate(0.4F, 1.25F + entity.getBbHeight(), 0.2F);
-                matrixStackIn.mulPose(Vector3f.YN.rotationDegrees(f));
-                matrixStackIn.mulPose(Vector3f.XN.rotationDegrees(180));
-                for (int i = 0; i < CLOUD_COUNT; i++) {
-                    float xSin = (float) Math.sin(realAge * 0.05F + i * 2F) * 0.1F;
-                    float ySin = (float) Math.cos(realAge * 0.05F + i * 2F) * 0.1F;
-                    float zSin = (float) Math.sin(realAge * 0.05F + i * 2F - 2F) * 0.1F;
-                    matrixStackIn.pushPose();
-                    matrixStackIn.translate(CLOUD_OFFSETS[i].x + xSin, CLOUD_OFFSETS[i].y + ySin, CLOUD_OFFSETS[i].z + zSin);
-                    matrixStackIn.scale((float) CLOUD_SCALES[i].x + xSin, (float) CLOUD_SCALES[i].y + ySin, (float) CLOUD_SCALES[i].z + xSin);
-                    renderVoidCloudCube(entity, matrixStackIn, bufferIn.getBuffer(DIRenderTypes.VOID_CLOUD));
-                    matrixStackIn.popPose();
-
-                }
-                matrixStackIn.popPose();
-            }
             if (TameableUtils.isZombiePet(living)) {
                 ResourceLocation mobTexture = getTextureLocation(living);
                 Pair<Integer, Integer> xandyDimensions = TextureSizer.getTextureWidth(mobTexture);
@@ -205,55 +151,6 @@ public class LayerPetOverlays extends RenderLayer {
                 matrixStackIn.pushPose();
                 this.getParentModel().renderToBuffer(matrixStackIn, zombieBuffer, packedLightIn, LivingEntityRenderer.getOverlayCoords((LivingEntity) entity, 0), 0, 0.5F, 0, alpha);
                 matrixStackIn.popPose();
-            }
-            int shadowHandCount = TameableUtils.getEnchantLevel(living, DIEnchantmentRegistry.SHADOW_HANDS);
-            if (shadowHandCount > 0) {
-                Entity punching = TameableUtils.getPetAttackTarget(living);
-                double d0 = 0;
-                double d1 = 0;
-                double d2 = 0;
-                if (punching != null) {
-                    d0 = Mth.lerp(partialTicks, punching.xo, punching.getX()) - Mth.lerp(partialTicks, living.xo, living.getX());
-                    d1 = Mth.lerp(partialTicks, punching.yo, punching.getY()) - Mth.lerp(partialTicks, living.yo, living.getY());
-                    d2 = Mth.lerp(partialTicks, punching.zo, punching.getZ()) - Mth.lerp(partialTicks, living.zo, living.getZ());
-                }
-                double d3 = d0 * d0 + d2 * d2 + d1 * d1;
-                double d4 = Math.sqrt(d0 * d0 + d2 * d2);
-                float f1 = (float) (Mth.atan2(d2, d0) * (double) (180F / (float) Math.PI)) - 90.0F;
-                float f2 = (float) (-(Mth.atan2(d1, d4) * (double) (180F / (float) Math.PI)));
-                for (int i = 0; i < shadowHandCount; i++) {
-                    float punch = getPunchFor(living, i, partialTicks) / 10F;
-                    VertexConsumer vertexconsumer = bufferIn.getBuffer(DIRenderTypes.SHADOW_HAND_ENTITY);
-                    float xSpread = shadowHandCount <= 1 ? 0F : ((i) / (float) (shadowHandCount - 1)) - 0.5F;
-                    float xOffset = shadowHandCount <= 1 ? 0 : Mth.sin((float) (xSpread * Math.PI)) * 1.8F;
-                    float zOffset = shadowHandCount <= 1 ? 0.25F : Mth.cos((float) (xSpread * Math.PI)) * 1.8F;
-                    float yOffset = -zOffset * 0.3F;
-                    Vec3 fromPos = new Vec3(0, 1.25F - entity.getBbHeight() * 0.5F, -entity.getBbWidth() * 0.3F);
-                    Vec3 handTranslate = new Vec3(xOffset * entity.getBbWidth(), 1 + yOffset + Math.sin(realAge * 0.2F + i * 1.5F) * 0.15F, zOffset * entity.getBbWidth());
-                    if (punching != null) {
-                        Vec3 vec3 = new Vec3(d0, d1, d2).scale(punch);
-                        handTranslate = handTranslate.add(vec3).yRot((float) Math.PI + f1 * (float) (Math.PI / 180));
-                    }
-                    matrixStackIn.pushPose();
-                    if (punching != null) {
-                        matrixStackIn.mulPose(Vector3f.YN.rotationDegrees(f));
-                        matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(f1));
-                        matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(f2));
-                    }
-
-                    matrixStackIn.pushPose();
-                    matrixStackIn.translate(handTranslate.x, handTranslate.y, handTranslate.z);
-                    matrixStackIn.pushPose();
-                    matrixStackIn.translate(0, -1.15F, -0.15F);
-                    SHADOW_HAND_MODEL.animateShadowHand(punch, i, shadowHandCount, realAge);
-                    SHADOW_HAND_MODEL.renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, LivingEntityRenderer.getOverlayCoords((LivingEntity) entity, 0), 1, 1, 1, 1);
-                    matrixStackIn.popPose();
-                    matrixStackIn.popPose();
-                    matrixStackIn.pushPose();
-                    renderShadowString(entity, fromPos, partialTicks, matrixStackIn, bufferIn, handTranslate);
-                    matrixStackIn.popPose();
-                    matrixStackIn.popPose();
-                }
             }
             if (TameableUtils.hasEnchant(living, DIEnchantmentRegistry.BLAZING_PROTECTION)) {
                 int bars = TameableUtils.getBlazingProtectionBars(living);
@@ -300,32 +197,4 @@ public class LayerPetOverlays extends RenderLayer {
         }
     }
 
-    private float getPunchFor(LivingEntity living, int i, float partialTicks) {
-        int[] arr = TameableUtils.getShadowPunchTimes(living);
-        if (arr.length > i) {
-            if (ClientProxy.shadowPunchRenderData.containsKey(living) && ClientProxy.shadowPunchRenderData.get(living).length > i) {
-                int[] prevArr = ClientProxy.shadowPunchRenderData.get(living);
-                return prevArr[i] + (arr[i] - prevArr[i]) * partialTicks;
-            }
-            return arr[i];
-        }
-        return 0F;
-    }
-
-    private void renderVoidCloudCube(Entity entity, PoseStack poseStack, VertexConsumer consumer) {
-        Matrix4f cubeAt = poseStack.last().pose();
-        this.renderVoidCloudFace(entity, cubeAt, consumer, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, Direction.SOUTH);
-        this.renderVoidCloudFace(entity, cubeAt, consumer, 0.0F, 1.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, Direction.NORTH);
-        this.renderVoidCloudFace(entity, cubeAt, consumer, 1.0F, 1.0F, 1.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.0F, Direction.EAST);
-        this.renderVoidCloudFace(entity, cubeAt, consumer, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 0.0F, Direction.WEST);
-        this.renderVoidCloudFace(entity, cubeAt, consumer, 0.0F, 1.0F, 0, 0, 0.0F, 0.0F, 1.0F, 1.0F, Direction.DOWN);
-        this.renderVoidCloudFace(entity, cubeAt, consumer, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 0.0F, 0.0F, Direction.UP);
-    }
-
-    private void renderVoidCloudFace(Entity entity, Matrix4f p_173696_, VertexConsumer p_173697_, float p_173698_, float p_173699_, float p_173700_, float p_173701_, float p_173702_, float p_173703_, float p_173704_, float p_173705_, Direction p_173706_) {
-        p_173697_.vertex(p_173696_, p_173698_, p_173700_, p_173702_).overlayCoords(240).endVertex();
-        p_173697_.vertex(p_173696_, p_173699_, p_173700_, p_173703_).overlayCoords(240).endVertex();
-        p_173697_.vertex(p_173696_, p_173699_, p_173701_, p_173704_).overlayCoords(240).endVertex();
-        p_173697_.vertex(p_173696_, p_173698_, p_173701_, p_173705_).overlayCoords(240).endVertex();
-    }
 }

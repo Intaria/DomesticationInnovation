@@ -1,7 +1,6 @@
 package com.github.alexthe668.domesticationinnovation.mixin;
 
 import com.github.alexthe668.domesticationinnovation.server.enchantment.DIEnchantmentRegistry;
-import com.github.alexthe668.domesticationinnovation.server.entity.PsychicWallEntity;
 import com.github.alexthe668.domesticationinnovation.server.entity.TameableUtils;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.world.entity.Entity;
@@ -63,20 +62,6 @@ public class EntityMixin {
             cir.setReturnValue(true);
         }
     }
-
-    @Inject(
-            method = {"Lnet/minecraft/world/entity/Entity;canCollideWith(Lnet/minecraft/world/entity/Entity;)Z"},
-            remap = true,
-            at = @At(value = "HEAD"),
-            cancellable = true
-    )
-    protected void di_canCollideWith(Entity other, CallbackInfoReturnable<Boolean> cir) {
-        if(other instanceof PsychicWallEntity && ((PsychicWallEntity)other).isSameTeam((Entity)(Object)this)){
-            cir.setReturnValue(false);
-        }
-    }
-
-
 
     @Inject(
             method = {"Lnet/minecraft/world/entity/Entity;getMovementEmission()Lnet/minecraft/world/entity/Entity$MovementEmission;"},

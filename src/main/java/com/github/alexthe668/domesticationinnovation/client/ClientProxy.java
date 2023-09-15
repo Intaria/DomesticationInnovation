@@ -54,9 +54,6 @@ import java.util.stream.Collectors;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientProxy extends CommonProxy {
 
-    public static final Map<Integer, DiscJockeySound> DISC_JOCKEY_SOUND_MAP = new HashMap<>();
-    public static Map<Entity, int[]> shadowPunchRenderData = new HashMap<>();
-
     @SubscribeEvent
     @OnlyIn(Dist.CLIENT)
     public static void onAddLayers(EntityRenderersEvent.AddLayers event) {
@@ -85,13 +82,10 @@ public class ClientProxy extends CommonProxy {
     @Override
     @OnlyIn(Dist.CLIENT)
     public void clientInit() {
-        EntityRenderers.register(DIEntityRegistry.CHAIN_LIGHTNING.get(), ChainLightningRender::new);
         EntityRenderers.register(DIEntityRegistry.RECALL_BALL.get(), RecallBallRender::new);
         EntityRenderers.register(DIEntityRegistry.FEATHER.get(), RenderFeather::new);
         EntityRenderers.register(DIEntityRegistry.GIANT_BUBBLE.get(), RenderGiantBubble::new);
-        EntityRenderers.register(DIEntityRegistry.FOLLOWING_JUKEBOX.get(), RenderJukeboxFollower::new);
         EntityRenderers.register(DIEntityRegistry.HIGHLIGHTED_BLOCK.get(), RenderHighlightedBlock::new);
-        EntityRenderers.register(DIEntityRegistry.PSYCHIC_WALL.get(), RenderPsychicWall::new);
         ItemProperties.register(DIItemRegistry.FEATHER_ON_A_STICK.get(), new ResourceLocation("cast"), (stack, lvl, holder, i) -> {
             if (holder == null) {
                 return 0.0F;
@@ -111,16 +105,12 @@ public class ClientProxy extends CommonProxy {
 
     public static void setupParticles(RegisterParticleProvidersEvent event) {
         DomesticationMod.LOGGER.debug("Registered particle factories");
-        event.register(DIParticleRegistry.DEFLECTION_SHIELD.get(), new ParticleDeflectionShield.Factory());
-        event.register(DIParticleRegistry.MAGNET.get(), ParticleMagnet.Factory::new);
         event.register(DIParticleRegistry.ZZZ.get(), ParticleZZZ.Factory::new);
         event.register(DIParticleRegistry.GIANT_POP.get(), ParticleGiantPop.Factory::new);
         event.register(DIParticleRegistry.SIMPLE_BUBBLE.get(), ParticleSimpleBubble.Factory::new);
         event.register(DIParticleRegistry.VAMPIRE.get(), ParticleVampire.Factory::new);
         event.register(DIParticleRegistry.SNIFF.get(), ParticleSniff.Factory::new);
-        event.register(DIParticleRegistry.PSYCHIC_WALL.get(), ParticlePsychicWall.Factory::new);
         event.register(DIParticleRegistry.INTIMIDATION.get(), new ParticleIntimidation.Factory());
-        event.register(DIParticleRegistry.BLIGHT.get(), ParticleBlight.Factory::new);
         event.register(DIParticleRegistry.LANTERN_BUGS.get(), ParticleLanternBugs.Factory::new);
     }
 
@@ -215,35 +205,8 @@ public class ClientProxy extends CommonProxy {
         }
     }
 
-    public void updateVisualDataForMob(Entity entity, int[] arr) {
-        shadowPunchRenderData.put(entity, arr);
-    }
-
     @OnlyIn(Dist.CLIENT)
     public void updateEntityStatus(Entity entity, byte updateKind) {
-        if (entity instanceof FollowingJukeboxEntity) {
-            SoundEvent record = ((FollowingJukeboxEntity) entity).getRecordSound();
-            if (entity.isAlive() && updateKind == 66) {
-                DiscJockeySound sound;
-                if (record != null && (DISC_JOCKEY_SOUND_MAP.get(entity.getId()) == null || DISC_JOCKEY_SOUND_MAP.get(entity.getId()).getRecordSound() != record)) {
-                    sound = new DiscJockeySound(record, (FollowingJukeboxEntity) entity);
-                    DISC_JOCKEY_SOUND_MAP.put(entity.getId(), sound);
-                } else {
-                    sound = DISC_JOCKEY_SOUND_MAP.get(entity.getId());
-                }
-                if (sound != null && !Minecraft.getInstance().getSoundManager().isActive(sound) && sound.canPlaySound() && sound.isNearest()) {
-                    Minecraft.getInstance().getSoundManager().play(sound);
-                }
-            }
-            if (updateKind == 67 || record == null) {
-                if (DISC_JOCKEY_SOUND_MAP.containsKey(entity.getId())) {
-                    DiscJockeySound sound = DISC_JOCKEY_SOUND_MAP.get(entity.getId());
-                    DISC_JOCKEY_SOUND_MAP.remove(entity.getId());
-                    Minecraft.getInstance().getSoundManager().stop(sound);
-                }
-            }
-        }
+        
     }
-
-
 }
