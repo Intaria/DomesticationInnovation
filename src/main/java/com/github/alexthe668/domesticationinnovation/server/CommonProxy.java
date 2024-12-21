@@ -259,7 +259,7 @@ public class CommonProxy {
                 TameableUtils.absorbExpOrbs(event.getEntity());
             }
             int oreLvl = TameableUtils.getEnchantLevel(event.getEntity(), DIEnchantmentRegistry.ORE_SCENTING);
-            if (oreLvl > 0) {
+            if (oreLvl > 0 && !event.getEntity().level.isClientSide) {
                 int interval = 100 + Math.max(150, 550 - oreLvl * 100);
                 TameableUtils.detectRandomOres(event.getEntity(), interval, 5 + oreLvl * 2, oreLvl * 50, oreLvl * 3);
             }
@@ -275,7 +275,7 @@ public class CommonProxy {
                     mob.getNavigation().moveTo(mob.getTarget(), 1.0D);
                 }
             }
-            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.BLAZING_PROTECTION)) {
+            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.BLAZING_PROTECTION) && !event.getEntity().level.isClientSide) {
                 int bars = TameableUtils.getBlazingProtectionBars(event.getEntity());
                 if (bars < 2 * TameableUtils.getEnchantLevel(event.getEntity(), DIEnchantmentRegistry.BLAZING_PROTECTION)) {
                     int cooldown = TameableUtils.getBlazingProtectionCooldown(event.getEntity());
@@ -288,7 +288,7 @@ public class CommonProxy {
                     TameableUtils.setBlazingProtectionCooldown(event.getEntity(), cooldown);
                 }
             }
-            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.HEALING_AURA)) {
+            if (TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.HEALING_AURA) && !event.getEntity().level.isClientSide) {
                 int time = TameableUtils.getHealingAuraTime(event.getEntity());
                 if (time > 0) {
                     List<LivingEntity> hurtNearby = TameableUtils.getAuraHealables(event.getEntity());
@@ -342,14 +342,16 @@ public class CommonProxy {
                 int bars = TameableUtils.getBlazingProtectionBars(event.getEntity());
                 if (bars > 0) {
                     Entity attacker = event.getSource().getEntity();
-                    if (attacker instanceof LivingEntity && !TameableUtils.hasSameOwnerAs((LivingEntity) attacker, event.getEntity())) {
-                        attacker.setSecondsOnFire(5 + event.getEntity().getRandom().nextInt(3));
-                        ((LivingEntity) attacker).knockback(0.4, event.getEntity().getX() - attacker.getX(), event.getEntity().getZ() - attacker.getZ());
+                    if (attacker instanceof LivingEntity livingAttacker && !TameableUtils.hasSameOwnerAs(livingAttacker, event.getEntity())) {
+                        livingAttacker.setSecondsOnFire(5 + event.getEntity().getRandom().nextInt(3));
+                        livingAttacker.knockback(0.4, event.getEntity().getX() - livingAttacker.getX(), event.getEntity().getZ() - livingAttacker.getZ());
                     }
                     event.setCanceled(true);
                     flag = true;
-                    for (int i = 0; i < 3 + event.getEntity().getRandom().nextInt(3); i++) {
-                        attacker.level.addParticle(ParticleTypes.FLAME, event.getEntity().getRandomX(0.8F), event.getEntity().getRandomY(), event.getEntity().getRandomZ(0.8F), 0.0F, 0.0F, 0.0F);
+                    if(attacker != null){
+                        for (int i = 0; i < 3 + event.getEntity().getRandom().nextInt(3); i++) {
+                            attacker.level.addParticle(ParticleTypes.FLAME, event.getEntity().getRandomX(0.8F), event.getEntity().getRandomY(), event.getEntity().getRandomZ(0.8F), 0.0F, 0.0F, 0.0F);
+                        }
                     }
                     event.getEntity().playSound(DISoundRegistry.BLAZING_PROTECTION.get(), 1, event.getEntity().getVoicePitch());
                     TameableUtils.setBlazingProtectionBars(event.getEntity(), bars - 1);

@@ -9,6 +9,7 @@ import net.minecraft.world.item.Item;
 
 public class DITagRegistry {
     public static final TagKey<EntityType<?>> REFUSES_COLLAR_TAGS = registerEntity("refuses_collar_tags");
+    public static final TagKey<EntityType<?>> REFUSES_PET_BEDS = registerEntity("refuses_pet_beds");
     public static final TagKey<Item> TAME_FROGS_WITH = registerItem("tame_frogs_with");
 
     private static TagKey<EntityType<?>> registerEntity(String name) {
